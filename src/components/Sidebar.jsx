@@ -62,23 +62,44 @@ export default function Sidebar() {
           <Code fw={700}>v1.0.0</Code>
         </Group>
         {data.map(
-          (item) =>
-            item.requiredRole === user.role && (
-              <a
-                className={classes.link}
-                data-active={item.label === active || undefined}
-                href={item.link}
-                key={item.label}
-                onClick={(event) => {
-                  event.preventDefault();
-                  setActive(item.label);
-                  navigate(item.link);
-                }}
-              >
-                <item.icon className={classes.linkIcon} stroke={1.5} />
-                <span>{item.label}</span>
-              </a>
-            )
+          (item) => {
+            if (!('requiredRole' in item)) {
+              return (
+                <a
+                  className={classes.link}
+                  data-active={item.label === active || undefined}
+                  href={item.link}
+                  key={item.label}
+                  onClick={(event) => {
+                    event.preventDefault();
+                    setActive(item.label);
+                    navigate(item.link);
+                  }}
+                >
+                  <item.icon className={classes.linkIcon} stroke={1.5} />
+                  <span>{item.label}</span>
+                </a>
+              );
+            }
+            if (item.requiredRole === 'Admin' && item.requiredRole === user.role) {
+              return (
+                <a
+                  className={classes.link}
+                  data-active={item.label === active || undefined}
+                  href={item.link}
+                  key={item.label}
+                  onClick={(event) => {
+                    event.preventDefault();
+                    setActive(item.label);
+                    navigate(item.link);
+                  }}
+                >
+                  <item.icon className={classes.linkIcon} stroke={1.5} />
+                  <span>{item.label}</span>
+                </a>
+              );
+            }
+          }
         )}
       </div>
 
