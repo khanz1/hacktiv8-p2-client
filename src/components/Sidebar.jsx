@@ -45,7 +45,7 @@ export default function Sidebar() {
           <Link to="/" style={{ cursor: 'pointer' }}>
             <img src={"/assets/FantasyCatLogo.png"} width={50} />
           </Link>
-          <Code fw={700}>v1.0.6</Code>
+          <Code fw={700}>v1.0.10</Code>
         </Group>
         {data.map(
           (item) => {
