@@ -23,23 +23,10 @@ const data = [
 
 export default function Sidebar() {
   const [active, setActive] = useState("Dashboard");
-  const [user, setUser] = useState({});
   const navigate = useNavigate();
   const location = useLocation();
+  const role = localStorage.getItem("role");
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      const { data } = await serverApi.get("/me", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-        },
-      });
-
-      setUser(data);
-    };
-
-    fetchUser();
-  }, []);
 
   useEffect(() => {
     const activeItem = data.find((item) => item.link === location.pathname);
@@ -63,7 +50,7 @@ export default function Sidebar() {
         </Group>
         {data.map(
           (item) => {
-            if (!('requiredRole' in item)) {
+            if (item && item.requiredRole && role === 'Admin') {
               return (
                 <a
                   className={classes.link}
@@ -80,8 +67,7 @@ export default function Sidebar() {
                   <span>{item.label}</span>
                 </a>
               );
-            }
-            if (item.requiredRole === 'Admin' && item.requiredRole === user.role) {
+            } else {
               return (
                 <a
                   className={classes.link}

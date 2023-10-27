@@ -25,6 +25,7 @@ export default function LoginPage() {
     try {
       const { data } = await serverApi.post("/login", { email, password });
       localStorage.setItem("access_token", data.access_token);
+      localStorage.setItem("role", data.role);
 
       showSuccessNotification("Login success");
       navigate("/admin");
