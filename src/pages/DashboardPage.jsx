@@ -231,7 +231,7 @@ export default function DashboardPage() {
                       <Table.Td>{movie.author.username}</Table.Td>
                       <Table.Td>
                         <Group gap={0} justify="flex-end">
-                          {movie.isEditable && (
+                          {movie.isUpdatable && (
                             <ActionIcon variant="subtle" color="gray">
                               <IconPencil
                                 onClick={() => handleOpenEditForm(movie)}
