@@ -8,7 +8,6 @@ import {
 } from "@tabler/icons-react";
 import classes from "../styles/Sidebar.module.css";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { serverApi } from "../utils/serverApi";
 
 const data = [
   { link: "/admin", label: "Dashboard", icon: IconDashboard },

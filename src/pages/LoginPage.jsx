@@ -15,8 +15,8 @@ import {
 } from "../utils/notification";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("assistance.xavier@gmail.com");
-  const [password, setPassword] = useState("12345678");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
   const handleOnSubmit = async (e) => {
