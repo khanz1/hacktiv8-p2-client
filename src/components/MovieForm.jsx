@@ -28,6 +28,13 @@ export function Form({ opened, close, onSubmit, movie }) {
       setRating(movie.rating);
       setTrailerUrl(movie.trailerUrl);
       setImgUrl(movie.imgUrl);
+    } else {
+      setTitle("");
+      setSynopsis("");
+      setGenre("");
+      setRating(1);
+      setTrailerUrl("");
+      setImgUrl("");
     }
     const fetchGenres = async () => {
       const { data } = await serverApi.get("/genres", {
@@ -41,15 +48,6 @@ export function Form({ opened, close, onSubmit, movie }) {
     };
 
     fetchGenres();
-
-    return () => {
-      setTitle("");
-      setSynopsis("");
-      setGenre("");
-      setRating(1);
-      setTrailerUrl("");
-      setImgUrl("");
-    }
   }, [movie]);
 
   const handleSubmit = (e) => {
