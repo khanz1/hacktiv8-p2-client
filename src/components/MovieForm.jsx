@@ -41,6 +41,15 @@ export function Form({ opened, close, onSubmit, movie }) {
     };
 
     fetchGenres();
+
+    return () => {
+      setTitle("");
+      setSynopsis("");
+      setGenre("");
+      setRating(1);
+      setTrailerUrl("");
+      setImgUrl("");
+    }
   }, [movie]);
 
   const handleSubmit = (e) => {
