@@ -49,7 +49,7 @@ export function Form({ opened, close, onSubmit, movie, formState }) {
     };
 
     fetchGenres();
-  }, [formState]);
+  }, [movie, formState]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
