@@ -11,7 +11,8 @@ import { useEffect, useMemo, useState } from "react";
 import PropTypes from "prop-types";
 import { serverApi } from "../utils/serverApi";
 
-export function Form({ opened, close, onSubmit, movie }) {
+export function Form({ opened, close, onSubmit, movie, formState }) {
+  console.log(formState, '<< fs')
   const [genres, setGenres] = useState([]);
   const [genre, setGenre] = useState("");
   const [rating, setRating] = useState(1);
@@ -21,12 +22,12 @@ export function Form({ opened, close, onSubmit, movie }) {
   const [imgUrl, setImgUrl] = useState("");
 
   useEffect(() => {
-    if (movie && 'title' in movie) {
+    if (formState === "update") {
       setTitle(movie.title);
       setSynopsis(movie.synopsis);
       setGenre(movie.genre.name);
       setRating(movie.rating);
-      setTrailerUrl(movie.trailerUrl);
+      setTrailerUrl(movie.trailerUrl || '');
       setImgUrl(movie.imgUrl);
     } else {
       setTitle("");
@@ -48,7 +49,7 @@ export function Form({ opened, close, onSubmit, movie }) {
     };
 
     fetchGenres();
-  }, [movie]);
+  }, [formState]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -65,8 +66,15 @@ export function Form({ opened, close, onSubmit, movie }) {
 
   const genreList = useMemo(() => genres.map(({ name }) => name), [genres]);
 
+  console.log({
+    title,
+    synopsis,
+    genre,
+    rating,
+    trailerUrl,
+    imgUrl,
+  })
   return (
-    <>
       <Modal opened={opened} onClose={close} title="Create Movie">
         <form onSubmit={handleSubmit}>
           <Stack>
@@ -123,12 +131,11 @@ export function Form({ opened, close, onSubmit, movie }) {
           </Stack>
         </form>
       </Modal>
-    </>
   );
 }
 Form.propTypes = {
   opened: PropTypes.bool.isRequired,
-  open: PropTypes.func.isRequired,
+  formState: PropTypes.oneOf(["create", "update"]).isRequired,
   close: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
   movie: PropTypes.shape({

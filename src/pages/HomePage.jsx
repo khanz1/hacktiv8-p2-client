@@ -26,7 +26,7 @@ export default function HomePage() {
   const [requestParams, setRequestParams] = useState({
     search: "",
     filter: [],
-    sort: "title",
+    sort: "-createdAt",
     page: {
       size: 8,
       number: 1,
@@ -77,11 +77,7 @@ export default function HomePage() {
 
   const sorting = useMemo(() => {
     return {
-      value:
-        requestParams.sort[0] === "-"
-          ? `${requestParams.sort.toLowerCase().slice(1)} DESC`
-          : `${requestParams.sort.toLowerCase()} ASC`,
-      order: requestParams.sort[0] === "-" ? "DESC" : "ASC",
+      value: requestParams.sort[0].startsWith("-") ? `latest` : `oldest`,
     };
   }, [requestParams])
 
@@ -129,25 +125,26 @@ export default function HomePage() {
           </Card>
         </Grid.Col>
         <Grid.Col span={10}>
-          <Group justify="space-between" my="md" mx="xl">
+          <Group justify="space-between" mb="md" mx="xl">
+            <Select
+              label="Sort"
+              placeholder="Pick value"
+              data={["latest", "oldest"]}
+              value={sorting.value}
+              onChange={(value) => {
+                const sortBy =
+                  value.toLowerCase() === "latest" ? "-createdAt" : "createdAt";
+                setRequestParams({
+                  ...requestParams,
+                  sort: sortBy,
+                });
+              }}
+            />
+
             <Text>
               Showing {metaPage.fromItem} - {metaPage.toItem} movie from total{" "}
               {totalData}
             </Text>
-
-            <Select
-              label="Sort By"
-              placeholder="Pick value"
-              data={["title ASC", "title DESC"]}
-              value={sorting.value}
-              onChange={(value) => {
-                const [sortBy, order] = value.split(" ");
-                setRequestParams({
-                  ...requestParams,
-                  sort: order === 'DESC' ? `-${sortBy}` : sortBy,
-                });
-              }}
-            />
           </Group>
           <div
             style={{

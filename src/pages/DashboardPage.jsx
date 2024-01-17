@@ -61,7 +61,7 @@ export default function DashboardPage() {
 
   const handleUpdateMovie = async (form) => {
     try {
-      const { data } = await serverApi.put("/movies", form, {
+      const { data } = await serverApi.put("/movies/" + selectedMovie.id, form, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("access_token")}`,
         },
@@ -71,6 +71,7 @@ export default function DashboardPage() {
         showSuccessNotification("Movie has been updated");
         const dataMovies = await fetchAdminMovies();
         setMovies(dataMovies);
+        setSelectedMovie({});
         close();
       }
     } catch (err) {
@@ -137,7 +138,6 @@ export default function DashboardPage() {
   };
 
   const handleOnUploadOpen = (movie) => {
-    console.log("gantengggg");
     setSelectedMovie(movie);
     openUpload();
   };
