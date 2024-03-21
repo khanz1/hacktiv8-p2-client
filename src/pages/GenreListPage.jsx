@@ -1,16 +1,25 @@
 import { Table, Anchor, Text, Box } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { fetchAdminGenres } from "../utils/serverApi";
-import Sidebar from "../components/Sidebar";
+import Loading from "../components/Loading";
+import { showErrorNotification } from "../utils/notification";
 
 export default function GenreListPage() {
   const [genres, setGenres] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchGenres = async () => {
-      const data = await fetchAdminGenres();
+      try {
+        setLoading(true);
+        const data = await fetchAdminGenres();
 
-      setGenres(data);
+        setGenres(data);
+      } catch (err) {
+        showErrorNotification(err.response.data.message);
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchGenres();
@@ -21,17 +30,17 @@ export default function GenreListPage() {
       <Text size="xl" fw={700} my="lg">
         List of Genres
       </Text>
-      <Table.ScrollContainer minWidth={800}>
-        <Table highlightOnHover verticalSpacing="xs">
-          <Table.Thead>
-            <Table.Tr>
-              <Table.Th>No</Table.Th>
-              <Table.Th>Name</Table.Th>
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>
-            {genres.map((genre, i) => {
-              return (
+      <Loading state={loading}>
+        <Table.ScrollContainer minWidth={800}>
+          <Table highlightOnHover verticalSpacing="xs">
+            <Table.Thead>
+              <Table.Tr>
+                <Table.Th>No</Table.Th>
+                <Table.Th>Name</Table.Th>
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>
+              {genres.map((genre, i) => (
                 <Table.Tr key={genre.id}>
                   <Table.Td>
                     <Anchor component="button" fz="sm">
@@ -40,11 +49,11 @@ export default function GenreListPage() {
                   </Table.Td>
                   <Table.Td>{genre.name}</Table.Td>
                 </Table.Tr>
-              );
-            })}
-          </Table.Tbody>
-        </Table>
-      </Table.ScrollContainer>
+              ))}
+            </Table.Tbody>
+          </Table>
+        </Table.ScrollContainer>
+      </Loading>
     </Box>
   );
 }

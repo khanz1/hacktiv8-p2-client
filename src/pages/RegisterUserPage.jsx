@@ -12,7 +12,6 @@ import {
 import { useState } from "react";
 import { serverApi } from "../utils/serverApi";
 import { useNavigate } from "react-router-dom";
-import Sidebar from "../components/Sidebar";
 import {
   showErrorNotification,
   showSuccessNotification,
@@ -42,13 +41,12 @@ export default function RegisterUserPage() {
 
       navigate("/admin");
     } catch (err) {
-      console.log(err, ",<< e");
       showErrorNotification(err.response.data.message);
     }
   };
 
   const onChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    setForm((prevForm) => ({ ...prevForm, [e.target.name]: e.target.value }));
   };
 
   return (

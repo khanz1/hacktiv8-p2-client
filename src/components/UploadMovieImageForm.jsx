@@ -1,6 +1,5 @@
-import { Modal } from "@mantine/core";
 import PropTypes from "prop-types";
-import { Group, Text, rem, Button } from "@mantine/core";
+import { Group, Text, rem, Button, Modal } from "@mantine/core";
 import { IconUpload, IconPhoto, IconX } from "@tabler/icons-react";
 import { Dropzone, IMAGE_MIME_TYPE } from "@mantine/dropzone";
 import { useRef, useState } from "react";
@@ -20,7 +19,6 @@ export function UploadMovieImageForm(props) {
         openRef={openRef}
         loading={isProcessing}
         onDrop={(file) => props.onDrop(file, setIsProcessing)}
-        onReject={(files) => console.log("rejected files", files)}
         maxSize={3 * 1024 ** 2}
         accept={IMAGE_MIME_TYPE}
       >

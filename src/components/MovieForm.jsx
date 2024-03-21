@@ -10,6 +10,8 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import PropTypes from "prop-types";
 import { serverApi } from "../utils/serverApi";
+import { showErrorNotification } from "../utils/notification";
+import Overlay from "./Overlay";
 
 export function Form({ opened, close, onSubmit, movie, formState }) {
   const [genres, setGenres] = useState([]);
@@ -20,14 +22,15 @@ export function Form({ opened, close, onSubmit, movie, formState }) {
   const [trailerUrl, setTrailerUrl] = useState("");
   const [imgUrl, setImgUrl] = useState("");
 
+  const [visible, setVisible] = useState(false);
+
   useEffect(() => {
     if (formState === "update") {
-      console.log(movie, '<< m')
       setTitle(movie.title);
       setSynopsis(movie.synopsis);
       setGenre(movie.genre.name);
       setRating(movie.rating);
-      setTrailerUrl(movie.trailerUrl || '');
+      setTrailerUrl(movie.trailerUrl || "");
       setImgUrl(movie.imgUrl);
     } else {
       setTitle("");
@@ -51,81 +54,93 @@ export function Form({ opened, close, onSubmit, movie, formState }) {
     fetchGenres();
   }, [movie, formState]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSubmit({
-      title,
-      synopsis,
-      genreId: genres.find(({ name }) => name === genre).id,
-      rating,
-      trailerUrl,
-      imgUrl,
-    });
-  }
-
+    setVisible(true);
+    try {
+      setVisible(true);
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await onSubmit({
+        title,
+        synopsis,
+        genreId: genres.find(({ name }) => name === genre).id,
+        rating,
+        trailerUrl,
+        imgUrl,
+      });
+    } catch (err) {
+      showErrorNotification(err.response.data.message);
+    } finally {
+      setVisible(false);
+    }
+  };
 
   const genreList = useMemo(() => genres.map(({ name }) => name), [genres]);
 
   const actionTitle = useMemo(
-    () => formState.charAt(0).toUpperCase() + formState.slice(1)
-  , [formState]); 
+    () => formState.charAt(0).toUpperCase() + formState.slice(1),
+    [formState]
+  );
 
   return (
     <Modal opened={opened} onClose={close} title={`${actionTitle} Movie`}>
-      <form onSubmit={handleSubmit}>
-        <Stack>
-          <TextInput
-            label="Title"
-            placeholder="Your name"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
-
-          <Textarea
-            required
-            label="Synopsis"
-            placeholder="A Brief description of the movie"
-            value={synopsis}
-            onChange={(e) => setSynopsis(e.target.value)}
-          />
-
-          <Group justify="space-between" grow>
-            <Select
-              w="100%"
-              label="Genre"
-              data={genreList}
-              value={genre}
-              onChange={(e) => setGenre(e.currentTarget.value)}
-            />
-            <Select
-              w="100%"
-              label="Rating"
-              data={Array.from({ length: 10 }, (_, i) => i + 1)}
-              value={rating}
-              onChange={(e) => setRating(e.currentTarget.value)}
-            />
-          </Group>
-
-          <Group justify="space-between" grow>
+      <Overlay state={visible}>
+        <form onSubmit={handleSubmit}>
+          <Stack>
             <TextInput
+              label="Title"
+              placeholder="Your name"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+
+            <Textarea
               required
-              label="Image URL"
-              placeholder="Your full path image url"
-              value={imgUrl}
-              onChange={(e) => setImgUrl(e.target.value)}
+              label="Synopsis"
+              placeholder="A Brief description of the movie"
+              value={synopsis}
+              onChange={(e) => setSynopsis(e.target.value)}
             />
-            <TextInput
-              label="Trailer URL"
-              placeholder="Your full path trailer url"
-              value={trailerUrl}
-              onChange={(e) => setTrailerUrl(e.target.value)}
-            />
-          </Group>
-          <Group>
-            <Button type="submit">{actionTitle}</Button>
-          </Group>
-        </Stack>
-      </form>
+
+            <Group justify="space-between" grow>
+              <Select
+                w="100%"
+                label="Genre"
+                data={genreList}
+                value={genre}
+                onChange={(e) => setGenre(e.currentTarget.value)}
+              />
+              <Select
+                w="100%"
+                label="Rating"
+                data={Array.from({ length: 10 }, (_, i) => i + 1)}
+                value={rating}
+                onChange={(e) => setRating(e.currentTarget.value)}
+              />
+            </Group>
+
+            <Group justify="space-between" grow>
+              <TextInput
+                required
+                label="Image URL"
+                placeholder="Your full path image url"
+                value={imgUrl}
+                onChange={(e) => setImgUrl(e.target.value)}
+              />
+              <TextInput
+                label="Trailer URL"
+                placeholder="Your full path trailer url"
+                value={trailerUrl}
+                onChange={(e) => setTrailerUrl(e.target.value)}
+              />
+            </Group>
+
+            <Group justify="center">
+              <Button type="submit">{actionTitle}</Button>
+            </Group>
+          </Stack>
+        </form>
+      </Overlay>
     </Modal>
   );
 }

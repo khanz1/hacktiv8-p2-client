@@ -16,6 +16,8 @@ import { MovieCard } from "../components/MovieCard";
 import { IconSearch } from "@tabler/icons-react";
 import { useEffect, useMemo, useState } from "react";
 import { serverApi } from "../utils/serverApi";
+import Loading from "../components/Loading";
+import { showErrorNotification } from "../utils/notification";
 
 export default function HomePage() {
   const [movies, setMovies] = useState([]);
@@ -23,6 +25,7 @@ export default function HomePage() {
   const [totalPages, setTotalPages] = useState(0);
   const [totalData, setTotalData] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(false);
   const [requestParams, setRequestParams] = useState({
     search: "",
     filter: [],
@@ -54,14 +57,21 @@ export default function HomePage() {
 
   useEffect(() => {
     const fetchMovies = async () => {
-      const { data } = await serverApi.get("/pub/movies", {
-        params: requestParams,
-      });
+      try {
+        setLoading(true);
+        const { data } = await serverApi.get("/pub/movies", {
+          params: requestParams,
+        });
 
-      setMovies(data.data);
-      setTotalPages(data.totalPages);
-      setCurrentPage(data.currentPage);
-      setTotalData(data.totalData);
+        setMovies(data.data);
+        setTotalPages(data.totalPages);
+        setCurrentPage(data.currentPage);
+        setTotalData(data.totalData);
+      } catch (error) {
+        showErrorNotification(error.response.data.message);
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchMovies();
@@ -79,7 +89,7 @@ export default function HomePage() {
     return {
       value: requestParams.sort[0].startsWith("-") ? `Latest` : `Oldest`,
     };
-  }, [requestParams])
+  }, [requestParams]);
 
   return (
     <Container size="xl" my={25}>
@@ -131,9 +141,7 @@ export default function HomePage() {
               data={["Latest", "Oldest"]}
               value={sorting.value}
               onChange={(value) => {
-                console.log(value, '<<< b')
-                const sortBy =
-                  value === "Latest" ? "-createdAt" : "createdAt";
+                const sortBy = value === "Latest" ? "-createdAt" : "createdAt";
                 setRequestParams({
                   ...requestParams,
                   sort: sortBy,
@@ -146,27 +154,29 @@ export default function HomePage() {
               {totalData}
             </Text>
           </Group>
-          <div
-            style={{
-              display: "flex",
-              gap: 5,
-              flexWrap: "wrap",
-              justifyContent: "center",
-              alignContent: "flex-start",
-            }}
-          >
-            {movies.map((movie) => (
-              <MovieCard key={movie.id} movie={movie} />
-            ))}
-          </div>
-          <div style={{ display: "flex", justifyContent: "center" }}>
-            <Pagination
-              my={20}
-              value={+currentPage}
-              total={totalPages}
-              onChange={setPage}
-            />
-          </div>
+          <Loading state={loading}>
+            <div
+              style={{
+                display: "flex",
+                gap: 5,
+                flexWrap: "wrap",
+                justifyContent: "center",
+                alignContent: "flex-start",
+              }}
+            >
+              {movies.map((movie) => (
+                <MovieCard key={movie.id} movie={movie} />
+              ))}
+            </div>
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <Pagination
+                my={20}
+                value={+currentPage}
+                total={totalPages}
+                onChange={setPage}
+              />
+            </div>
+          </Loading>
         </Grid.Col>
       </Grid>
     </Container>

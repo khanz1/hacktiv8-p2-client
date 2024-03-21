@@ -3,7 +3,7 @@ import classes from "../styles/MovieDetail.module.css";
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { serverApi } from "../utils/serverApi";
-import { IconArrowBack } from "@tabler/icons-react";
+import { IconArrowLeft } from "@tabler/icons-react";
 
 export default function MovieDetailPage() {
   const navigate = useNavigate();
@@ -38,7 +38,7 @@ export default function MovieDetailPage() {
         aria-label="Button Back"
         onClick={() => navigate(-1)}
       >
-        <IconArrowBack style={{ width: "70%", height: "70%" }} stroke={1.5} />
+        <IconArrowLeft style={{ width: "70%", height: "70%" }} stroke={1.5} />
       </ActionIcon>
       <Group wrap="nowrap" grow justify="space-between" gap={"lg"}>
         <Image src={movie.imgUrl} h="100vh" />
