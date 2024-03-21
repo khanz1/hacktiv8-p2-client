@@ -9,6 +9,7 @@ import {
   rem,
   Box,
   Tooltip,
+  ScrollAreaAutosize,
 } from "@mantine/core";
 import { IconPlus, IconPencil, IconTrash } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
@@ -22,9 +23,19 @@ import {
   showSuccessNotification,
 } from "../utils/notification";
 
+const initialSelectedMovie = {
+  id: 0,
+  title: "",
+  synopsis: "",
+  genre: { name: "" },
+  rating: 1,
+  trailerUrl: "",
+  imgUrl: "",
+};
+
 export default function DashboardPage() {
   const [movies, setMovies] = useState([]);
-  const [selectedMovie, setSelectedMovie] = useState({});
+  const [selectedMovie, setSelectedMovie] = useState(initialSelectedMovie);
   const [opened, { open, close }] = useDisclosure(false);
   const [uploadOpened, { open: openUpload, close: closeUpload }] =
     useDisclosure(false);
@@ -71,7 +82,7 @@ export default function DashboardPage() {
         showSuccessNotification("Movie has been updated");
         const dataMovies = await fetchAdminMovies();
         setMovies(dataMovies);
-        setSelectedMovie({});
+        setSelectedMovie(initialSelectedMovie);
         close();
       }
     } catch (err) {
@@ -143,8 +154,7 @@ export default function DashboardPage() {
   };
 
   return (
-    <div style={{ display: "flex" }}>
-      <Sidebar />
+    <Box>
       <UploadMovieImageForm
         opened={uploadOpened}
         close={closeUpload}
@@ -164,8 +174,8 @@ export default function DashboardPage() {
           }
         }}
       />
-      <Box m={10} w={"100%"}>
-        <Group justify="space-between" align="center" my="lg">
+      <Box style={{ position: 'sticky', top: 0 }}>
+        <Group justify="space-between" align="center" py="lg">
           <Text size="xl" fw={700}>
             List of Movies
           </Text>
@@ -177,88 +187,92 @@ export default function DashboardPage() {
             Create
           </Button>
         </Group>
-        <div>
-          <ScrollArea h="85vh">
-            <Table highlightOnHover verticalSpacing="xs">
-              <Table.Thead>
-                <Table.Tr>
-                  <Table.Th>No</Table.Th>
-                  <Table.Th>Title</Table.Th>
-                  <Table.Th>Synopsis</Table.Th>
-                  <Table.Th>Image</Table.Th>
-                  <Table.Th>Rating</Table.Th>
-                  <Table.Th>Author</Table.Th>
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody>
-                {movies.map((movie, i) => {
-                  return (
-                    <Table.Tr key={movie.id}>
-                      <Table.Td>
-                        <Anchor component="button" fz="sm">
-                          {i + 1}
-                        </Anchor>
-                      </Table.Td>
-                      <Table.Td>{movie.title}</Table.Td>
-                      <Table.Td>{movie.synopsis}</Table.Td>
-                      <Table.Td
-                        style={{
-                          cursor: movie.isImageUpdatable
-                            ? "pointer"
-                            : "inherit",
-                        }}
-                        onClick={() =>
-                          movie.isImageUpdatable && handleOnUploadOpen(movie)
-                        }
-                      >
-                        {movie.isImageUpdatable ? (
-                          <Tooltip label="Click to update image">
-                            <img
-                              width={150}
-                              src={movie.imgUrl}
-                              alt={`poster of movie ${movie.title}`}
-                            />
-                          </Tooltip>
-                        ) : (
+        <ScrollArea>
+          <Table highlightOnHover verticalSpacing="xs">
+            <Table.Thead>
+              <Table.Tr>
+                <Table.Th>No</Table.Th>
+                <Table.Th>Title</Table.Th>
+                <Table.Th>Synopsis</Table.Th>
+                <Table.Th>Image</Table.Th>
+                <Table.Th>Rating</Table.Th>
+                <Table.Th>Author</Table.Th>
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>
+              {movies.map((movie, i) => {
+                return (
+                  <Table.Tr key={movie.id}>
+                    <Table.Td>
+                      <Anchor component="button" fz="sm">
+                        {i + 1}
+                      </Anchor>
+                    </Table.Td>
+                    <Table.Td>
+                      <Text size="sm">{movie.title}</Text>
+                    </Table.Td>
+                    <Table.Td>
+                      <Text size="sm">{movie.synopsis}</Text>
+                    </Table.Td>
+                    <Table.Td
+                      style={{
+                        cursor: movie.isImageUpdatable ? "pointer" : "inherit",
+                      }}
+                      onClick={() =>
+                        movie.isImageUpdatable && handleOnUploadOpen(movie)
+                      }
+                    >
+                      {movie.isImageUpdatable ? (
+                        <Tooltip label="Click to update image">
                           <img
                             width={150}
                             src={movie.imgUrl}
                             alt={`poster of movie ${movie.title}`}
                           />
+                        </Tooltip>
+                      ) : (
+                        <img
+                          width={150}
+                          src={movie.imgUrl}
+                          alt={`poster of movie ${movie.title}`}
+                        />
+                      )}
+                    </Table.Td>
+                    <Table.Td>
+                      <Text size="sm">{movie.rating}</Text>
+                    </Table.Td>
+                    <Table.Td>
+                      <Text size="sm">{movie.author.username}</Text>
+                    </Table.Td>
+                    <Table.Td>
+                      <Group gap={0} justify="flex-end">
+                        {movie.isUpdatable && (
+                          <ActionIcon variant="subtle" color="gray">
+                            <IconPencil
+                              onClick={() => handleOpenEditForm(movie)}
+                              style={{ width: rem(16), height: rem(16) }}
+                              stroke={1.5}
+                            />
+                          </ActionIcon>
                         )}
-                      </Table.Td>
-                      <Table.Td>{movie.rating}</Table.Td>
-                      <Table.Td>{movie.author.username}</Table.Td>
-                      <Table.Td>
-                        <Group gap={0} justify="flex-end">
-                          {movie.isUpdatable && (
-                            <ActionIcon variant="subtle" color="gray">
-                              <IconPencil
-                                onClick={() => handleOpenEditForm(movie)}
-                                style={{ width: rem(16), height: rem(16) }}
-                                stroke={1.5}
-                              />
-                            </ActionIcon>
-                          )}
-                          {movie.isDeletable && (
-                            <ActionIcon variant="subtle" color="red">
-                              <IconTrash
-                                onClick={() => handleDeleteMovie(movie)}
-                                style={{ width: rem(16), height: rem(16) }}
-                                stroke={1.5}
-                              />
-                            </ActionIcon>
-                          )}
-                        </Group>
-                      </Table.Td>
-                    </Table.Tr>
-                  );
-                })}
-              </Table.Tbody>
-            </Table>
-          </ScrollArea>
-        </div>
+                        {movie.isDeletable && (
+                          <ActionIcon variant="subtle" color="red">
+                            <IconTrash
+                              onClick={() => handleDeleteMovie(movie)}
+                              style={{ width: rem(16), height: rem(16) }}
+                              stroke={1.5}
+                            />
+                          </ActionIcon>
+                        )}
+                      </Group>
+                    </Table.Td>
+                  </Table.Tr>
+                );
+              })}
+            </Table.Tbody>
+          </Table>
+        </ScrollArea>
       </Box>
-    </div>
+    </Box>
   );
 }

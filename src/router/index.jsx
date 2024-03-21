@@ -3,41 +3,30 @@ import HomePage from "../pages/HomePage";
 import MovieDetailPage from "../pages/MovieDetailPage";
 import DashboardPage from "../pages/DashboardPage";
 import GenreListPage from "../pages/GenreListPage";
-import Navbar from "../components/Navbar";
 import LoginPage from "../pages/LoginPage";
 import RegisterUserPage from "../pages/RegisterUserPage";
-
+import AdminLayout from "../layouts/AdminLayout";
+import PublicLayout from "../layouts/PublicLayout";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: (
-      <>
-        <Navbar />
-        <HomePage />
-      </>
-    ),
+    element: <PublicLayout />,
+    children: [
+      { path: "", element: <HomePage /> },
+      {
+        path: "login",
+        loader: () => {
+          if (localStorage.getItem("access_token")) {
+            throw redirect("/admin");
+          }
+          return null;
+        },
+        element: <LoginPage />,
+      },
+    ],
   },
-  {
-    path: "/login",
-    loader: () => {
-      if (localStorage.getItem("access_token")) {
-        throw redirect("/admin");
-      }
-      return null;
-    },
-    element: (
-      <>
-        <Navbar />
-        <LoginPage />
-      
-      </>
-    ),
-  },
-  {
-    path: "/movies/:id",
-    element: <MovieDetailPage />,
-  },
+  { path: "movies/:id", element: <MovieDetailPage /> },
   {
     path: "/admin",
     loader: () => {
@@ -46,31 +35,12 @@ const router = createBrowserRouter([
       }
       return null;
     },
-    element: (
-      <>
-        <DashboardPage />
-      </>
-    ),
-  },
-  {
-    path: "/admin/genres",
-    loader: () => {
-      if (!localStorage.getItem("access_token")) {
-        throw redirect("/login");
-      }
-      return null;
-    },
-    element: <GenreListPage />,
-  },
-  {
-    path: "/admin/user",
-    loader: () => {
-      if (!localStorage.getItem("access_token")) {
-        throw redirect("/login");
-      }
-      return null;
-    },
-    element: <RegisterUserPage />,
+    element: <AdminLayout />,
+    children: [
+      { path: "", element: <DashboardPage /> },
+      { path: "genres", element: <GenreListPage /> },
+      { path: "user", element: <RegisterUserPage /> },
+    ],
   },
 ]);
 

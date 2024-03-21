@@ -13,7 +13,7 @@ export function UploadMovieImageForm(props) {
     <Modal
       opened={props.opened}
       onClose={props.close}
-      title="Upload New Movie Image"
+      title="Upload New Cover Image"
       size="lg"
     >
       <Dropzone

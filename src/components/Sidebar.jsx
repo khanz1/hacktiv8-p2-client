@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Group, Code } from "@mantine/core";
+import { Group, Code, Button } from "@mantine/core";
 import {
   IconLogout,
   IconDashboard,
@@ -10,11 +10,21 @@ import classes from "../styles/Sidebar.module.css";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
 const data = [
-  { link: "/admin", label: "Dashboard", icon: IconDashboard },
-  { link: "/admin/genres", label: "Genre List", icon: IconCategory },
+  {
+    link: "/admin",
+    requiredRole: ["Staff", "Admin"],
+    label: "Dashboard",
+    icon: IconDashboard,
+  },
+  {
+    link: "/admin/genres",
+    requiredRole: ["Staff", "Admin"],
+    label: "Genre List",
+    icon: IconCategory,
+  },
   {
     link: "/admin/user",
-    requiredRole: "Admin",
+    requiredRole: ["Admin"],
     label: "Create Staff",
     icon: IconUser,
   },
@@ -25,7 +35,6 @@ export default function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
   const role = localStorage.getItem("role");
-
 
   useEffect(() => {
     const activeItem = data.find((item) => item.link === location.pathname);
@@ -42,57 +51,44 @@ export default function Sidebar() {
     <nav className={classes.navbar}>
       <div className={classes.navbarMain}>
         <Group className={classes.header} justify="space-between">
-          <Link to="/" style={{ cursor: 'pointer' }}>
-            <img src={"/assets/FantasyCatLogo.png"} width={50} />
+          <Link to="/" style={{ cursor: "pointer" }}>
+            <img
+              src={"/assets/FantasyCatLogo.png"}
+              width={50}
+              alt="Fantasy Cat"
+            />
           </Link>
-          <Code fw={700}>v1.0.10</Code>
+          <Code fw={700}>v1.1.0</Code>
         </Group>
-        {data.map(
-          (item) => {
-            if (item && item.requiredRole && role === 'Admin') {
-              return (
-                <a
-                  className={classes.link}
-                  data-active={item.label === active || undefined}
-                  href={item.link}
-                  key={item.label}
-                  onClick={(event) => {
-                    event.preventDefault();
-                    setActive(item.label);
-                    navigate(item.link);
-                  }}
-                >
-                  <item.icon className={classes.linkIcon} stroke={1.5} />
-                  <span>{item.label}</span>
-                </a>
-              );
-            } else {
-              return (
-                <a
-                  className={classes.link}
-                  data-active={item.label === active || undefined}
-                  href={item.link}
-                  key={item.label}
-                  onClick={(event) => {
-                    event.preventDefault();
-                    setActive(item.label);
-                    navigate(item.link);
-                  }}
-                >
-                  <item.icon className={classes.linkIcon} stroke={1.5} />
-                  <span>{item.label}</span>
-                </a>
-              );
-            }
-          }
-        )}
+        {data
+          .filter((item) => item.requiredRole.includes(role))
+          .map((item) => (
+            <a
+              className={classes.link}
+              data-active={item.label === active || undefined}
+              href={item.link}
+              key={item.label}
+              onClick={(event) => {
+                event.preventDefault();
+                setActive(item.label);
+                navigate(item.link);
+              }}
+            >
+              <item.icon className={classes.linkIcon} stroke={1.5} />
+              <span>{item.label}</span>
+            </a>
+          ))}
       </div>
 
       <div className={classes.footer}>
-        <a href="#" className={classes.link} onClick={handleLogout}>
+        <Button
+          variant="subtle"
+          w="100%"
+          onClick={handleLogout}
+        >
           <IconLogout className={classes.linkIcon} stroke={1.5} />
           <span>Logout</span>
-        </a>
+        </Button>
       </div>
     </nav>
   );

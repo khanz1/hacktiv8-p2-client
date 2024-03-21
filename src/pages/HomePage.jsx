@@ -77,7 +77,7 @@ export default function HomePage() {
 
   const sorting = useMemo(() => {
     return {
-      value: requestParams.sort[0].startsWith("-") ? `latest` : `oldest`,
+      value: requestParams.sort[0].startsWith("-") ? `Latest` : `Oldest`,
     };
   }, [requestParams])
 
@@ -127,13 +127,13 @@ export default function HomePage() {
         <Grid.Col span={10}>
           <Group justify="space-between" mb="md" mx="xl">
             <Select
-              label="Sort"
               placeholder="Pick value"
-              data={["latest", "oldest"]}
+              data={["Latest", "Oldest"]}
               value={sorting.value}
               onChange={(value) => {
+                console.log(value, '<<< b')
                 const sortBy =
-                  value.toLowerCase() === "latest" ? "-createdAt" : "createdAt";
+                  value === "Latest" ? "-createdAt" : "createdAt";
                 setRequestParams({
                   ...requestParams,
                   sort: sortBy,
