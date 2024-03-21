@@ -59,7 +59,6 @@ export function Form({ opened, close, onSubmit, movie, formState }) {
     setVisible(true);
     try {
       setVisible(true);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
       await onSubmit({
         title,
         synopsis,
