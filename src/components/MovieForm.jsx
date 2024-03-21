@@ -25,21 +25,6 @@ export function Form({ opened, close, onSubmit, movie, formState }) {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    if (formState === "update") {
-      setTitle(movie.title);
-      setSynopsis(movie.synopsis);
-      setGenre(movie.genre.name);
-      setRating(movie.rating);
-      setTrailerUrl(movie.trailerUrl || "");
-      setImgUrl(movie.imgUrl);
-    } else {
-      setTitle("");
-      setSynopsis("");
-      setGenre("");
-      setRating(1);
-      setTrailerUrl("");
-      setImgUrl("");
-    }
     const fetchGenres = async () => {
       const { data } = await serverApi.get("/genres", {
         headers: {
@@ -52,7 +37,25 @@ export function Form({ opened, close, onSubmit, movie, formState }) {
     };
 
     fetchGenres();
-  }, [movie, formState]);
+  }, []);
+
+  useEffect(() => {
+    if (formState === "update") {
+      setTitle(movie.title);
+      setSynopsis(movie.synopsis);
+      setGenre(movie.genre.name);
+      setRating(movie.rating);
+      setTrailerUrl(movie.trailerUrl || "");
+      setImgUrl(movie.imgUrl);
+    } else {
+      setTitle("");
+      setSynopsis("");
+      setGenre(genres[0]?.name);
+      setRating(1);
+      setTrailerUrl("");
+      setImgUrl("");
+    }
+  }, [movie, formState, opened]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -87,6 +90,7 @@ export function Form({ opened, close, onSubmit, movie, formState }) {
         <form onSubmit={handleSubmit}>
           <Stack>
             <TextInput
+              data-autofocus
               label="Title"
               placeholder="Your name"
               value={title}
@@ -107,14 +111,14 @@ export function Form({ opened, close, onSubmit, movie, formState }) {
                 label="Genre"
                 data={genreList}
                 value={genre}
-                onChange={(e) => setGenre(e.currentTarget.value)}
+                onChange={setGenre}
               />
               <Select
                 w="100%"
                 label="Rating"
                 data={Array.from({ length: 10 }, (_, i) => i + 1)}
                 value={rating}
-                onChange={(e) => setRating(e.currentTarget.value)}
+                onChange={setRating}
               />
             </Group>
 

@@ -6,12 +6,10 @@ import { Notifications } from "@mantine/notifications";
 
 function App() {
   return (
-    <>
       <MantineProvider defaultColorScheme="dark">
         <Notifications />
         <RouterProvider router={router} />
       </MantineProvider>
-    </>
   );
 }
 
